@@ -1,5 +1,7 @@
 # CIEL Asset Audit
 
+[**Voir le rapport de démonstration · données fictives**](https://itztov4r.github.io/ciel-asset-audit/)
+
 **Contrôler la qualité d’un inventaire informatique CSV et générer un rapport HTML lisible.**
 
 Projet Python pédagogique pour le Bac pro CIEL, sans dépendance externe. Toutes les données de démonstration sont fictives.
@@ -62,3 +64,5 @@ Cet outil analyse uniquement le contenu fourni dans le CSV. Il ne découvre aucu
 Projet préparé pour le portfolio de **Mehdi Hmaiss**, avec assistance IA pour le code, la documentation et les tests. Projet d’apprentissage, sans revendication d’utilisation en entreprise.
 
 Licence MIT — voir [LICENSE](LICENSE).
+
+Le rapport utilise un thème responsive embarqué dans `report_theme.py` ; `index.html` présente uniquement les données fictives de l’exemple.
