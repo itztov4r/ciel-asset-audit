@@ -16,7 +16,7 @@ def audit_rows(rows, min_ram=8):
     findings = []
     seen_ids, seen_ips = set(), set()
     for line, row in enumerate(rows, start=2):
-        asset = row.get('asset_id', '').strip()
+        asset = (row.get('asset_id') or '').strip()
         def add(message):
             findings.append({'line': line, 'asset_id': asset or '(vide)', 'message': message})
         for key in sorted(REQUIRED):
@@ -51,7 +51,7 @@ def audit_rows(rows, min_ram=8):
 
 def read_inventory(path):
     with Path(path).open(encoding='utf-8-sig', newline='') as stream:
-        reader = csv.DictReader(stream)
+        reader = csv.DictReader(stream, strict=True)
         if not reader.fieldnames or len(reader.fieldnames) != len(set(reader.fieldnames)):
             raise ValueError('En-têtes CSV absents ou dupliqués')
         missing = REQUIRED - set(reader.fieldnames)
@@ -111,3 +111,4 @@ def main():
 
 if __name__ == '__main__':
     raise SystemExit(main())
+
