@@ -43,6 +43,19 @@ class AuditTests(unittest.TestCase):
     def test_empty_inventory(self):
         self.assertEqual(audit_rows([])['assets'], 0)
 
+    def test_null_asset_is_reported_as_missing(self):
+        report = audit_rows([asset(asset_id=None)])
+        self.assertEqual(report['findings'][0]['asset_id'], '(vide)')
+
+    def test_unclosed_csv_quote_is_rejected(self):
+        import csv
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'input.csv'
+            path.write_text('asset_id,hostname,ip_address,os,ram_gb,location\n"PC-01,demo,192.0.2.1,Linux,8,Room', encoding='utf-8')
+            with self.assertRaises(csv.Error):
+                read_inventory(path)
+
 
 if __name__ == '__main__':
     unittest.main()
+
