@@ -1,0 +1,5 @@
+asset_id,hostname,ip_address,os,ram_gb,location
+PC-001,accueil,192.0.2.10,Windows 11,16,Accueil
+PC-002,atelier,192.0.2.11,Linux,4,Atelier
+PC-003,salle-01,192.0.2.10,Windows 11,8,Salle 1
+PC-003,salle-02,invalid,Linux,abc,Salle 2
