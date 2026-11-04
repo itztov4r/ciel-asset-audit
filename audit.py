@@ -66,10 +66,17 @@ def read_inventory(path):
 
 
 def render_html(report):
-    escape = lambda value: html.escape(str(value), quote=True)
-    findings = ''.join('<tr>' + ''.join(f'<td>{escape(f[k])}</td>' for k in ['line', 'asset_id', 'message']) + '</tr>' for f in report['findings'])
-    systems = ''.join(f'<li>{escape(os)} : {count}</li>' for os, count in report['os_distribution'].items())
-    return f'''<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CIEL Asset Audit</title><style>body{{font:16px system-ui;background:#f3f6fa;color:#18384a;max-width:1000px;margin:50px auto;padding:24px}}h1{{font-size:42px}}section{{background:white;padding:24px;border-radius:14px;margin:24px 0;overflow:auto}}table{{border-collapse:collapse;width:100%}}td,th{{text-align:left;padding:14px;border-bottom:1px solid #dde5ee}}small{{color:#62788a}}</style><small>CIEL / INVENTAIRE INFORMATIQUE</small><h1>État de l’inventaire.</h1><p>{report['assets']} équipements · {len(report['findings'])} observations</p><section><h2>Répartition des systèmes</h2><ul>{systems}</ul></section><section><h2>Points à vérifier</h2><table><tr><th>Ligne CSV</th><th>Équipement</th><th>Observation</th></tr>{findings}</table>{'<p>Aucune anomalie détectée par ces règles.</p>' if not findings else ''}</section><small>Contrôle de qualité des données et seuil RAM configurable. Aucun scan réseau ni diagnostic de sécurité.</small></html>'''
+    from report_theme import page, table, bars
+    finding_rows = [(f['line'], f['asset_id'], f['message']) for f in report['findings']]
+    affected = len({f['line'] for f in report['findings']})
+    body = '<div class="grid"><section class="panel"><h2>Répartition des systèmes</h2>'
+    body += bars(report['os_distribution'].items()) + '</section>'
+    body += '<section class="panel"><h2>Lecture du rapport</h2><p class="note">Chaque observation correspond à une règle de qualité : champ manquant, doublon, adresse IP ou RAM invalide, capacité mémoire sous le seuil configuré.</p><span class="tag">Analyse locale · CSV</span></section></div>'
+    body += '<section class="panel"><h2>Points à vérifier</h2>' + table(['Ligne CSV', 'Équipement', 'Observation'], finding_rows)
+    if not finding_rows:
+        body += '<p class="note">Aucune anomalie détectée par les règles configurées.</p>'
+    body += '</section><p class="note">Contrôle de qualité des données uniquement. Aucun scan réseau, diagnostic matériel ni audit de vulnérabilités. Le seuil RAM est une règle pédagogique configurable.</p>'
+    return page('Un inventaire plus clair.', 'Vue synthétique des équipements et des points à vérifier dans le fichier CSV fourni.', [('Équipements analysés', report['assets']), ('Lignes sans observation', report['assets'] - affected), ('Observations', len(report['findings']))], body, 'ASSET AUDIT')
 
 
 def positive(value):
